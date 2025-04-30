@@ -1,0 +1,34 @@
+name: Build and Release Binary
+
+on:
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    name: Build (Release)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up build environment
+        run: |
+          sudo apt update
+          sudo apt install -y g++
+
+      - name: Build in Release mode
+        run: g++ -o nx2elf *.cpp *.c -lstdc++fs -std=c++17
+
+      - name: Check binary exists
+        run: ls -l nx2elf
+
+      - name: Archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nx2elf-release
+          path: nx2elf
