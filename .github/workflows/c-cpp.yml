@@ -1,34 +1,35 @@
-name: Build and Release Binary
+name: Build Windows Executable (x86_64)
 
 on:
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:   # 允许手动触发
   push:
     branches:
       - main
       - master
 
 jobs:
-  build:
-    name: Build (Release)
+  build-windows:
+    name: Build for Windows (x86_64)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up build environment
+      - name: Install MinGW cross compiler
         run: |
           sudo apt update
-          sudo apt install -y g++
+          sudo apt install -y mingw-w64
 
-      - name: Build in Release mode
-        run: g++ -o nx2elf *.cpp *.c -lstdc++fs -std=c++17
+      - name: Compile Windows binary (x86_64)
+        run: |
+          x86_64-w64-mingw32-g++ *.cpp *.c -o nx2elf.exe -std=c++17 -lstdc++fs -static
 
-      - name: Check binary exists
-        run: ls -l nx2elf
+      - name: Check if .exe was created
+        run: ls -l nx2elf.exe
 
-      - name: Archive artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nx2elf-release
-          path: nx2elf
+          name: nx2elf-win64
+          path: nx2elf.exe
